@@ -6,16 +6,31 @@ let objectURL;
 let width; // set from text size
 const height = svg.clientHeight;
 
-canvas.width = width;
-canvas.height = height;
+const fieldIds = ['text', 'pointSize', 'density', 'rings', 'jitter', 'spread', 'tilt', 'font'];
 
-textField.value = localStorage.getItem('text') || 'hello';
-textField.focus();
-textField.setSelectionRange(textField.value.length, textField.value.length);
-textField.addEventListener('input', () => {
-  localStorage.setItem('text', textField.value);
+function init() {
+  canvas.width = width;
+  canvas.height = height;
+
+  for (const id of fieldIds) {
+    const value = localStorage.getItem(id);
+    if (value != null) {
+      document.getElementById(id).value = value;
+    }
+  }
+  textField.value = textField.value || 'hello';
+  textField.focus();
+  textField.setSelectionRange(textField.value.length, textField.value.length);
+
+  for (const id of fieldIds) {
+    document.getElementById(id).addEventListener('input', (event) => {
+      updateSVG();
+      localStorage.setItem(id, event.target.value);
+    });
+  }
+
   updateSVG();
-});
+}
 
 document.getElementById('download').addEventListener('click', (event) => {
   // remove hidden children before saving
@@ -64,20 +79,21 @@ function makeCircles(parent, n) {
   }
 }
 
-for (const id of ['pointSize', 'density', 'rings', 'jitter', 'spread', 'tilt']) {
-  document.getElementById(id).addEventListener('input', () => updateSVG());
+function rotate(x, y, cx, cy, angle) {
+  const a = Math.atan2(y - cy, x - cx) + angle;
+  const r = Math.hypot(x - cx, y - cy);
+  x = r * Math.cos(a) + width / 2;
+  y = r * Math.sin(a) + height / 2;
+  return [x, y];
 }
-
-// font requires a double-update to fix text metrics
-document.getElementById('font').addEventListener('input', () => {
-  updateSVG();
-  updateSVG();
-});
 
 function updateCanvas() {
   const ctx = canvas.getContext('2d');
+
+  // font needs to be set once before measuring and once before rendering (after changing width)
+  ctx.font = document.getElementById('font').value;
   const metrics = ctx.measureText(textField.value);
-  if (metrics.width == 0) {
+  if (metrics.width === 0) {
     imageData = { data: [], width: 0, height: 0 };
     return;
   }
@@ -133,10 +149,7 @@ function updateSVG() {
         const t = Math.asinh(spread) * 2 * (step / steps - 0.5);
         let x = width * (Math.sinh(t) / spread + 0.5);
         let y = height * ((a * yBuffer * Math.cosh(t) * ring) / rings + 0.5);
-        const angle = Math.atan2(y - height / 2, x - width / 2) + +tilt;
-        const r = Math.hypot(x - width / 2, y - height / 2);
-        x = r * Math.cos(angle) + width / 2;
-        y = r * Math.sin(angle) + height / 2;
+        [x, y] = rotate(x, y, width / 2, height / 2, +tilt);
         if (sampleText(x, y)) {
           pointAttrs.push({
             cx: x + (Math.random() - 0.5) * jitter,
@@ -157,5 +170,4 @@ function updateSVG() {
   });
 }
 
-updateSVG();
-updateSVG(); // need a second render to get text metrics working?
+init();

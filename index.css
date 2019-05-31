@@ -1,0 +1,23 @@
+#container {
+  width: 600px;
+  margin: 40px auto;
+  position: relative;
+}
+
+input#text {
+  border: none;
+  outline: none;
+  color: transparent;
+  caret-color: black;
+  z-index: 100;
+  width: 100%;
+}
+
+#svg {
+  width: 700px;
+  height: 140px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}

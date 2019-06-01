@@ -107,7 +107,6 @@ function updateCanvas() {
   ctx.fillStyle = 'black';
   ctx.textBaseline = 'middle';
   ctx.font = document.getElementById('font').value;
-
   ctx.fillText(textField.value, 0, canvas.height / 2);
 
   imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);

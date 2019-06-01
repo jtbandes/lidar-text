@@ -6,7 +6,7 @@ let objectURL;
 let width; // set from text size
 const height = svg.clientHeight;
 
-const fieldIds = ['text', 'pointSize', 'density', 'rings', 'jitter', 'spread', 'tilt', 'font'];
+const fieldIds = ['text', 'pointSize', 'density', 'rings', 'jitter', 'spread', 'tilt', 'font', 'color'];
 
 function init() {
   canvas.width = width;
@@ -136,6 +136,7 @@ function updateSVG() {
   const spread = document.getElementById('spread').value;
   const tilt = document.getElementById('tilt').value;
   const font = document.getElementById('font').value;
+  const color = document.getElementById('color').value;
   textField.style.font = font;
 
   const text = createElementSVG('text');
@@ -155,7 +156,7 @@ function updateSVG() {
             cx: x + (Math.random() - 0.5) * jitter,
             cy: y + (Math.random() - 0.5) * jitter,
             r: pointSize,
-            style: 'fill: black',
+            style: `fill: ${color}`,
           });
         }
       }

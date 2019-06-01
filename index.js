@@ -156,7 +156,7 @@ function updateSVG() {
             cx: x + (Math.random() - 0.5) * jitter,
             cy: y + (Math.random() - 0.5) * jitter,
             r: pointSize,
-            style: 'fill:' + color,
+            style: `fill: ${color}`,
           });
         }
       }
